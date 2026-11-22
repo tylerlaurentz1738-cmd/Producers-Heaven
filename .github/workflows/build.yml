@@ -1,0 +1,42 @@
+name: Build Producers Heaven
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -A x64
+
+      - name: Build VST3 + Standalone
+        run: cmake --build build --config Release --target ProducersHeaven_VST3 ProducersHeaven_Standalone --parallel
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProducersHeaven-Windows
+          path: |
+            build/ProducersHeaven_artefacts/Release/VST3/
+            build/ProducersHeaven_artefacts/Release/Standalone/
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+
+      - name: Build VST3
+        run: cmake --build build --config Release --target ProducersHeaven_VST3 --parallel
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProducersHeaven-macOS
+          path: build/ProducersHeaven_artefacts/Release/VST3/
